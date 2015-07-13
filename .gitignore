@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+# Eclipse specific files
+.cproject
+.project
+.settings
+.settings/
