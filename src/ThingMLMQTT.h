@@ -11,7 +11,8 @@
 #include "MQTTAsync.h"
 #include "ThingMLMQTTUtility.h"
 
-void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context);
+void nullset_thingml_mqtt_context(ThingMLMQTTContext* context);
+void create_mqtt_client(MQTTAsync* client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context);
 void connect_mqtt_client(ThingMLMQTTContext* context);
 void disconnect_mqtt_client(ThingMLMQTTContext* context);
 void subscribe_mqtt_client(ThingMLMQTTContext* context, const char* topic, int qos);

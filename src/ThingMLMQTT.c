@@ -113,11 +113,9 @@ void onSubscribeFailure(void* context, MQTTAsync_failureData* response)
 		thing_context->fn_onsubfail_callback(thing_context->thing_instance, response ? response->code : 0);
 }
 
-
-void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context) {
-	MQTTAsync_create(&client, serverURI, clientId, MQTTCLIENT_PERSISTENCE_NONE, NULL);
-	context->paho_client = client;
-	context->client_id = clientId;
+void nullset_thingml_mqtt_context(ThingMLMQTTContext* context) {
+	context->paho_client = NULL;
+	context->client_id = NULL;
 	context->fn_connlost_callback = NULL;
 	context->fn_onconn_callback = NULL;
 	context->fn_onconnfail_callback = NULL;
@@ -129,18 +127,24 @@ void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* cli
 	context->thing_instance = NULL;
 }
 
+void create_mqtt_client(MQTTAsync* client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context) {
+	MQTTAsync_create(client, serverURI, clientId, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+	context->paho_client = *client;
+	context->client_id = clientId;
+}
+
 
 void connect_mqtt_client(ThingMLMQTTContext* context) {
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
-	int rc;
-
-	MQTTAsync_setCallbacks(context->paho_client, context, connlost, onMessageArrived, NULL);
-
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
 	conn_opts.onSuccess = onConnect;
 	conn_opts.onFailure = onConnectFailure;
 	conn_opts.context = context;
+
+	MQTTAsync_setCallbacks(context->paho_client, context, connlost, onMessageArrived, NULL);
+
+	int rc;
 	if ((rc = MQTTAsync_connect(context->paho_client, &conn_opts)) != MQTTASYNC_SUCCESS)
 		printf("Failed to start connect, return code %d\n", rc);
 }
