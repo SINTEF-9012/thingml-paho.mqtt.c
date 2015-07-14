@@ -8,6 +8,8 @@ EXAMPLE_BIN = src/examples/publish_subscribe
 STATIC_LIB_LOCATION = libtmlmqtt.a
 DYNAMIC_LIB_LOCATION = libtmlmqtt.so
 
+PAHO_MQTT_LIB_A = -lpaho-mqtt3a
+
 CROSS_COMPILE :=
  
 GFLAGS = -pedantic -Wall -Werror -fPIC -g -std=c99 -DDEBUG=1
@@ -27,7 +29,7 @@ dynamiclib : $(OBJS)
 	$(GCC) -shared -rdynamic -o $(DYNAMIC_LIB_LOCATION) $(OBJS)
 
 examples : $(EXAMPLE_OBJ)
-	$(GCC) -o $(EXAMPLE_BIN) $(GFLAGS) -g $(EXAMPLE_OBJ) $(STATIC_LIB_LOCATION)
+	$(GCC) -o $(EXAMPLE_BIN) $(GFLAGS) -g $(EXAMPLE_OBJ) $(PAHO_MQTT_LIB_A) $(STATIC_LIB_LOCATION)
 
 clean :
 	rm -rf $(OBJS) $(EXAMPLE_OBJ) $(EXAMPLE_BIN) $(DYNAMIC_LIB_LOCATION) $(STATIC_LIB_LOCATION)

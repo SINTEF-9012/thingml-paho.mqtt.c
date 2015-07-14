@@ -118,6 +118,15 @@ void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* cli
 	MQTTAsync_create(&client, serverURI, clientId, MQTTCLIENT_PERSISTENCE_NONE, NULL);
 	context->paho_client = client;
 	context->client_id = clientId;
+	context->fn_connlost_callback = NULL;
+	context->fn_onconn_callback = NULL;
+	context->fn_onconnfail_callback = NULL;
+	context->fn_ondisconnet_callback = NULL;
+	context->fn_onmsgrcv_callback = NULL;
+	context->fn_onsend_callback = NULL;
+	context->fn_onsub_callback = NULL;
+	context->fn_onsubfail_callback = NULL;
+	context->thing_instance = NULL;
 }
 
 
