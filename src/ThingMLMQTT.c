@@ -5,6 +5,9 @@
  *      Author: vassik
  */
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 #include "ThingMLMQTT.h"
 
@@ -14,56 +17,59 @@ void connlost(void *context, char *cause) {
 	printf("\nConnection lost\n");
 	printf("     cause: %s\n", cause);
 
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
 
-	if(thing_context.fn_connlost_callback != NULL)
-		thing_context.fn_connlost_callback(thing_context.thing_instance, cause);
+	if(thing_context->fn_connlost_callback != NULL)
+		thing_context->fn_connlost_callback(thing_context->thing_instance, cause);
 }
 
 
 void onDisconnect(void* context, MQTTAsync_successData* response) {
 	printf("Successful disconnection\n");
 
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
 
-	if(thing_context.fn_ondisconnet_callback != NULL)
-			thing_context.fn_ondisconnet_callback(thing_context.thing_instance);
+	if(thing_context->fn_ondisconnet_callback != NULL)
+			thing_context->fn_ondisconnet_callback(thing_context->thing_instance);
 }
 
 
 void onSend(void* context, MQTTAsync_successData* response) {
 	printf("Message with token value %d delivery confirmed\n", response->token);
 
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
 
-	if(thing_context.fn_onsend_callback != NULL)
-		thing_context.fn_onsend_callback(thing_context.thing_instance, response->token);
+	if(thing_context->fn_onsend_callback != NULL)
+		thing_context->fn_onsend_callback(thing_context->thing_instance, response->token);
 }
 
 
 void onConnectFailure(void* context, MQTTAsync_failureData* response) {
 	printf("Connect failed, rc %d\n", response ? response->code : 0);
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
 
-	if(thing_context.fn_onconnfail_callback != NULL)
-		thing_context.fn_onconnfail_callback(thing_context.thing_instance, response ? response->code : 0);
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
+
+	if(thing_context->fn_onconnfail_callback != NULL)
+		thing_context->fn_onconnfail_callback(thing_context->thing_instance, response ? response->code : 0);
 }
 
 
 void onConnect(void* context, MQTTAsync_successData* response) {
 	printf("Successful connection\n");
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
 
-	if(thing_context.fn_onconn_callback != NULL)
-		thing_context.fn_onconn_callback(thing_context.thing_instance);
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
+
+	if(thing_context->fn_onconn_callback != NULL)
+		thing_context->fn_onconn_callback(thing_context->thing_instance);
 }
 
 
 int onMessageArrived(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
 	 printf("Message arrived\n");
 
-	 ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
-	 if(thing_context.fn_onmsgrcv_callback == NULL)
+	 ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
+
+	 if(thing_context->fn_onmsgrcv_callback == NULL)
 		 return 1;
 
 	 int message_length = message->payloadlen;
@@ -82,18 +88,18 @@ int onMessageArrived(void *context, char *topicName, int topicLen, MQTTAsync_mes
 	 MQTTAsync_freeMessage(&message);
 	 MQTTAsync_free(topicName);
 
-	 thing_context.fn_onmsgrcv_callback(thing_context.thing_instance, topic, payload);
+	 thing_context->fn_onmsgrcv_callback(thing_context->thing_instance, topic, payload);
 	 return 1;
 }
 
 
-void onSubscribe(void* context, MQTTAsync_successData* response)
-{
+void onSubscribe(void* context, MQTTAsync_successData* response) {
 	printf("Subscribe succeeded\n");
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
 
-	if(thing_context.fn_onsub_callback != NULL)
-		thing_context.fn_onsub_callback(thing_context.thing_instance);
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
+
+	if(thing_context->fn_onsub_callback != NULL)
+		thing_context->fn_onsub_callback(thing_context->thing_instance);
 }
 
 
@@ -101,22 +107,22 @@ void onSubscribeFailure(void* context, MQTTAsync_failureData* response)
 {
 	printf("Subscribe failed, rc %d\n", response ? response->code : 0);
 
-	ThingMLMQTTContext thing_context = (ThingMLMQTTContext) context;
+	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
 
-	if(thing_context.fn_onsubfail_callback != NULL)
-		thing_context.fn_onsubfail_callback(thing_context.thing_instance, response ? response->code : 0);
+	if(thing_context->fn_onsubfail_callback != NULL)
+		thing_context->fn_onsubfail_callback(thing_context->thing_instance, response ? response->code : 0);
 }
 
 
-void create_mqtt_client(MQTTAsync* client, const char* serverURI, const char* clientId) {
+void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context) {
 	MQTTAsync_create(&client, serverURI, clientId, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+	context->paho_client = client;
+	context->client_id = clientId;
 }
 
 
 void connect_mqtt_client(ThingMLMQTTContext* context) {
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
-	MQTTAsync_token token;
 	int rc;
 
 	MQTTAsync_setCallbacks(context->paho_client, context, connlost, onMessageArrived, NULL);
@@ -143,7 +149,6 @@ void disconnect_mqtt_client(ThingMLMQTTContext* context) {
 void subscribe_mqtt_client(ThingMLMQTTContext* context, const char* topic, int qos) {
 	int rc;
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 
 	opts.onSuccess = onSubscribe;
 	opts.onFailure = onSubscribeFailure;

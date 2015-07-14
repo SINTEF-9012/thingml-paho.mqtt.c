@@ -11,13 +11,13 @@
 #include "MQTTAsync.h"
 #include "ThingMLMQTTUtility.h"
 
-void create_mqtt_client(MQTTAsync* client, const char* serverURI, const char* clientId);
+void create_mqtt_client(MQTTAsync client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context);
 void connect_mqtt_client(ThingMLMQTTContext* context);
 void disconnect_mqtt_client(ThingMLMQTTContext* context);
 void subscribe_mqtt_client(ThingMLMQTTContext* context, const char* topic, int qos);
 void publish_mqtt_client(ThingMLMQTTContext* context, const char* topic, char* message, int qos);
 
-//callbacks
+/*callbacks*/
 void connlost(void *context, char *cause);
 void onDisconnect(void* context, MQTTAsync_successData* response);
 void onSend(void* context, MQTTAsync_successData* response);
