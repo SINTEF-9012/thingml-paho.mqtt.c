@@ -6,5 +6,5 @@ The library provides a lightweight and lifted up implementation to adopt paho.mq
 ### Run
 To compile static and dynamic libraries along with executable examples, use the following Makefile command:
 ```
->make
+~>make
 ```
