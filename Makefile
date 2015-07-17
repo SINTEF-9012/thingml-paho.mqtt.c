@@ -10,6 +10,10 @@ DYNAMIC_LIB_LOCATION = libtmlmqtt.so
 
 PAHO_MQTT_LIB_A = -lpaho-mqtt3a
 
+INSTALL_LIB_DIR = /usr/local/lib
+INSTALL_INCLUDE_DIR = /usr/local/include
+THINGML_PAHO_DIR = thingmlmqtt
+
 CROSS_COMPILE :=
  
 GFLAGS = -pedantic -Wall -Werror -fPIC -g -std=c99 -DDEBUG=1
@@ -27,6 +31,18 @@ staticlib : $(OBJS)
 
 dynamiclib : $(OBJS)
 	$(GCC) -shared -rdynamic -o $(DYNAMIC_LIB_LOCATION) $(OBJS)
+
+install: staticlib dynamiclib
+	install -d $(INSTALL_INCLUDE_DIR)/$(THINGML_PAHO_DIR)
+	install $(STATIC_LIB_LOCATION) $(INSTALL_LIB_DIR)
+	install $(DYNAMIC_LIB_LOCATION) $(INSTALL_LIB_DIR)
+	cp -r ./src/*.h $(INSTALL_INCLUDE_DIR)/$(THINGML_PAHO_DIR)
+	ldconfig
+
+uninstall:
+	rm -rf $(INSTALL_INCLUDE_DIR)/$(THINGML_PAHO_DIR)
+	rm -rf $(INSTALL_LIB_DIR)/$(STATIC_LIB_LOCATION)
+	rm -rf $(INSTALL_LIB_DIR)/$(DYNAMIC_LIB_LOCATION)
 
 examples : $(EXAMPLE_OBJ)
 	$(GCC) -o $(EXAMPLE_BIN) $(GFLAGS) -g $(EXAMPLE_OBJ) $(PAHO_MQTT_LIB_A) $(STATIC_LIB_LOCATION)
