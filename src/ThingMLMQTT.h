@@ -11,6 +11,10 @@
 #include "MQTTAsync.h"
 #include "ThingMLMQTTUtility.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void nullset_thingml_mqtt_context(ThingMLMQTTContext* context);
 void create_mqtt_client(MQTTAsync* client, const char* serverURI, const char* clientId, ThingMLMQTTContext* context);
 void connect_mqtt_client(ThingMLMQTTContext* context);
@@ -27,5 +31,9 @@ void onConnect(void* context, MQTTAsync_successData* response);
 int onMessageArrived(void *context, char *topicName, int topicLen, MQTTAsync_message *message);
 void onSubscribe(void* context, MQTTAsync_successData* response);
 void onSubscribeFailure(void* context, MQTTAsync_failureData* response);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SRC_THINGMLMQTT_H_ */

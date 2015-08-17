@@ -8,6 +8,10 @@
 #ifndef SRC_THINGMLMQTTUTILITY_H_
 #define SRC_THINGMLMQTTUTILITY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*pthingMLMQQTPaho)(void* _instance, ...);
 
 typedef struct {
@@ -24,5 +28,9 @@ typedef struct {
 	const char* client_id;
 
 } ThingMLMQTTContext;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SRC_THINGMLMQTTUTILITY_H_ */
