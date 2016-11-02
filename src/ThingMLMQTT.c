@@ -19,8 +19,10 @@ void connlost(void *context, char *cause) {
 
 	ThingMLMQTTContext* thing_context = (ThingMLMQTTContext*) context;
 
-	if(thing_context->fn_connlost_callback != NULL)
+	if(thing_context->fn_connlost_callback != NULL) {
+		cause = (cause != NULL) ? cause : "unknown";
 		thing_context->fn_connlost_callback(thing_context->thing_instance, cause);
+	}
 }
 
 
